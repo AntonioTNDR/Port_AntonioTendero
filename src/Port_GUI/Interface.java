@@ -1,12 +1,14 @@
 package Port_GUI;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Interface implements ActionListener {
-    Container container = new Container();
+public class Interface extends JFrame {
+    public Hub hub1 = new Hub();
+    public Hub hub2 = new Hub();
+    public Hub hub3 = new Hub();
+    private JPanel panel;
     private String[] countriesList = {"Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", "Czech Republic", "Denmark", "Estonia", "Finland", "France","Germany", "Greece", "Hungary", "Ireland", "Italy", "Latvia", "Lithuania", "Luxembourg", "Malta", "Netherlands", "Poland", "Portugal", "Romania", "Romania", "Slovenia", "Spain", "Sweden"};
     private ButtonGroup bg;
     private JComboBox countries;
@@ -28,7 +30,7 @@ public class Interface implements ActionListener {
     private JRadioButton priority3;
     private JCheckBox customs;
     public Interface() {
-        JPanel panel = new JPanel(); // generate new panel
+        panel = new JPanel(); // generate new panel
         JFrame frame = new JFrame(); // generate new frame
         frame.setSize(960,720); // resolution/size
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // close when you press "close" on windows
@@ -43,7 +45,6 @@ public class Interface implements ActionListener {
 
         IDfield = new JTextField(20); // generate ID field + coordinates
         IDfield.setBounds(100,20,300,25);
-        IDfield.addActionListener(this);
         panel.add(IDfield);
 
         JLabel Weightlabel = new JLabel("Weight (tons)"); // generate weight label + coordinates
@@ -51,7 +52,6 @@ public class Interface implements ActionListener {
         panel.add(Weightlabel);
 
         Weightfield = new JTextField(20); // generate weight field + coordinates
-        Weightfield.addActionListener(this);
         Weightfield.setBounds(100,80,300,25);
         panel.add(Weightfield);
 
@@ -61,6 +61,7 @@ public class Interface implements ActionListener {
 
         Description = new JTextArea();
         Description.setBounds(100,120,300,250); // area where the description will be
+        Description.getDocument();
         panel.add(Description);
 
         JLabel Remitent = new JLabel("Remitent company"); // Remitent label
@@ -82,37 +83,147 @@ public class Interface implements ActionListener {
         Pile = new JButton("Pile"); // button for "pile"
         Pile.setBounds(100,450,150,30);
         Pile.setFocusable(false);
+        Pile.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Container container = new Container();
+
+                int id = Integer.parseInt(IDfield.getText());
+                container.setId(id);
+
+                int weight = Integer.parseInt(Weightfield.getText());
+                container.setWeight(weight);
+                container.setCountryOfOrigin((String) countries2.getSelectedItem());
+                container.setInspected(customs.isSelected());
+                container.setReciving(textRemitent.getText());
+                container.setSending(textReciver.getText());
+                container.setContentDescription(Description.getText());
+
+                if(priority1.isSelected()){
+                    container.setPriority(1);
+                } else if(priority2.isSelected()){
+                    container.setPriority(2);
+                } else if(priority3.isSelected()){
+                    container.setPriority(3);
+                }
+
+                switch (container.getPriority()){
+                    case 1:
+                        if(!hub1.priority1Full()){
+                            hub1.stackContainer(container);
+                        }
+                        else if(!hub2.priority1Full()){
+                            hub2.stackContainer(container);
+                        }
+                        else if(!hub3.priority1Full()){
+                            hub3.stackContainer(container);
+                        }
+                        else{
+                            System.out.println("All spaces are full");
+                        }
+                        break;
+                    case 2:
+                        if(!hub1.priority2Full()){
+                            hub1.stackContainer(container);
+                        }
+                        else if(!hub2.priority2Full()){
+                            hub2.stackContainer(container);
+                        }
+                        else if(!hub3.priority2Full()){
+                            hub3.stackContainer(container);
+                        }
+                        else{
+                            System.out.println("All spaces are full");
+                        }
+                        break;
+                    case 3:
+                        if(!hub1.isHubFull()){
+                            hub1.stackContainer(container);
+                        }
+                        else if(!hub2.isHubFull()){
+                            hub2.stackContainer(container);
+                        }
+                        else if(!hub3.isHubFull()){
+                            hub3.stackContainer(container);
+                        }
+                        else{
+                            System.out.println("All spaces are full");
+                        }
+                        break;
+                }
+            }
+        });
         panel.add(Pile);
 
         unPile = new JButton("Un-pile"); // button for "un-pile"
         unPile.setBounds(100,485,150,30);
         unPile.setFocusable(false);
+        unPile.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int column = Integer.parseInt(Col_num.getText());
+                int hubNum = Integer.parseInt(JOptionPane.showInputDialog("Enter hub: "));
+                String errorMessage = "NOT VALID";
+                if(hubNum == 0 || hubNum > 3){
+                    JOptionPane.showMessageDialog(panel,errorMessage);
+                }
+                switch(hubNum){
+                    case 1:
+                        hub1.removeContainer(column);
+                        break;
+                    case 2:
+                        hub2.removeContainer(column);
+                        break;
+                    case 3:
+                        hub3.removeContainer(column);
+                        break;
+                }
+            }
+        });
         panel.add(unPile);
 
-        Col_num = new JTextField("Column number"); // field for the column number
+        Col_num = new JTextField(); // field for the column number
         Col_num.setBounds(260,485,150,30);
         panel.add(Col_num);
 
         showDescription = new JButton("Show description"); // button for "Show description"
         showDescription.setBounds(100,525,150,30);
         showDescription.setFocusable(false);
+        showDescription.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int id = Integer.parseInt(JOptionPane.showInputDialog("Enter id:\n"));
+                String h1 = hub1.displayContainer(id);
+                String h2 = hub2.displayContainer(id);
+                String h3 = hub3.displayContainer(id);
+                String message = "Hub 1: " + h1 + "\nHub 2: " + h2 + "\nHub 3: " + h3;
+                buttShowDesc.setText(message);
+            }
+        });
         panel.add(showDescription);
 
-        buttShowDesc = new JTextArea("Show description here"); // area for the description
-        buttShowDesc.setBounds(260,520,150,45);
-        buttShowDesc.setEditable(false);
+        buttShowDesc = new JTextArea(); // area for the description
+        buttShowDesc.setBounds(260,520,600,45);
         panel.add(buttShowDesc);
 
-        numContainers = new JButton("Number of containers"); // button for "Number of containers"
+        numContainers = new JButton("Number of containers"); // button for "Number of containers from country"
         numContainers.setBounds(100,570,150,30);
         numContainers.setFocusable(false);
+        numContainers.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int count1 = hub1.countContainersFromCountry((String) countries.getSelectedItem());
+                int count2 = hub2.countContainersFromCountry((String) countries.getSelectedItem());
+                int count3 = hub3.countContainersFromCountry((String) countries.getSelectedItem());
+                JOptionPane.showMessageDialog(panel,"Hub 1: "+count1+" Hub2: "+count2+" Hub3: "+count3);
+            }
+        });
         panel.add(numContainers);
 
 
         countries = new JComboBox(countriesList); // selectable list with all the countries
         countries.setBounds(260,570,150,30);
         countries.setFocusable(false);
-        countries.addActionListener(this);
         panel.add(countries);
 
         JLabel country = new JLabel("Country"); // Country Label
@@ -124,8 +235,9 @@ public class Interface implements ActionListener {
         countries2.setFocusable(false);
         panel.add(countries2);
 
-        containerNum = new JTextField("Put number here"); // Field for entering a number
+        containerNum = new JTextField(); // Field for entering a number
         containerNum.setBounds(415, 572, 150,25);
+        containerNum.setFocusable(false);
         panel.add(containerNum);
 
         JLabel priority = new JLabel("Priority"); // priority label
@@ -135,21 +247,18 @@ public class Interface implements ActionListener {
         bg = new ButtonGroup(); // Button Group to avoid having problems with the Radio Buttons
         priority1 = new JRadioButton("1"); // radio button "priority 1"
         priority1.setBounds(550,80,50,25);
-        priority1.addActionListener(this); // logic (to be implemented)
         priority1.setFocusable(false);
         panel.add(priority1);
         bg.add(priority1); // element added to the button group
 
         priority2 = new JRadioButton("2"); // radio button "priority 2"
         priority2.setBounds(600,80,50,25);
-        priority2.addActionListener(this); // logic (to be implemented)
         priority2.setFocusable(false);
         panel.add(priority2);
         bg.add(priority2); // element added to the button group
 
         priority3 = new JRadioButton("3"); // radio button "priority 3"
         priority3.setBounds(650,80,50,25);
-        priority3.addActionListener(this); // logic (to be implemented)
         priority3.setFocusable(false);
         panel.add(priority3);
         bg.add(priority3); // element added to the button group
@@ -160,15 +269,21 @@ public class Interface implements ActionListener {
 
         JTextArea hubPlan = new JTextArea(); // Text area for "State (hub plan)"
         hubPlan.setBounds(550,120,150,100);
+        hubPlan.setEditable(false);
+        hubPlan.setText(hub1.displayHub());
         panel.add(hubPlan);
 
-        JTextArea hub2 = new JTextArea();
-        hub2.setBounds(550,230,150,100);
-        panel.add(hub2);
+        JTextArea hub2t = new JTextArea();
+        hub2t.setBounds(550,230,150,100);
+        hub2t.setEditable(false);
+        hub2t.setText(hub2.displayHub());
+        panel.add(hub2t);
 
-        JTextArea hub3 = new JTextArea();
-        hub3.setBounds(550,340,150,100);
-        panel.add(hub3);
+        JTextArea hub3t = new JTextArea();
+        hub3t.setBounds(550,340,150,100);
+        hub3t.setEditable(false);
+        hub3t.setText(hub3.displayHub());
+        panel.add(hub3t);
 
         JLabel customsInspection = new JLabel("Customs inspection"); // Customs inspection label
         customsInspection.setBounds(450,450,80,25);
@@ -180,37 +295,6 @@ public class Interface implements ActionListener {
         panel.add(customs);
 
         frame.setVisible(true); // Set the GUI (graphical user interface) visible
-
-    }
-
-    // Logic method (NOT IMPLEMENTED YET)
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        int ID = Integer.parseInt(IDfield.getText());
-        container.setId(ID);
-
-        int weight = Integer.parseInt(Weightfield.getText());
-        container.setWeight(weight);
-
-        String country = countries2.getSelectedItem().toString();
-        container.setCountryOfOrigin(country);
-
-
-
-        if(e.getSource() == priority1){
-            container.setPriority(1);
-            System.out.println("1");
-        }
-        else if(e.getSource() == priority2){
-            container.setPriority(2);
-            System.out.println("2");
-        }
-        else if(e.getSource() == priority3){
-            container.setPriority(3);
-            System.out.println("3");
-        }
-
-
     }
 
 }
