@@ -203,11 +203,11 @@ public class Interface extends JFrame {
         panel.add(showDescription);
 
         buttShowDesc = new JTextArea(); // area for the description
-        buttShowDesc.setBounds(260,520,600,45);
+        buttShowDesc.setBounds(260,520,600,60);
         panel.add(buttShowDesc);
 
         numContainers = new JButton("Number of containers"); // button for "Number of containers from country"
-        numContainers.setBounds(100,570,150,30);
+        numContainers.setBounds(100,600,150,30);
         numContainers.setFocusable(false);
         numContainers.addActionListener(new ActionListener() {
             @Override
@@ -222,7 +222,7 @@ public class Interface extends JFrame {
 
 
         countries = new JComboBox(countriesList); // selectable list with all the countries
-        countries.setBounds(260,570,150,30);
+        countries.setBounds(260,600,150,30);
         countries.setFocusable(false);
         panel.add(countries);
 
@@ -234,11 +234,6 @@ public class Interface extends JFrame {
         countries2.setBounds(550,20,150,30);
         countries2.setFocusable(false);
         panel.add(countries2);
-
-        containerNum = new JTextField(); // Field for entering a number
-        containerNum.setBounds(415, 572, 150,25);
-        containerNum.setFocusable(false);
-        panel.add(containerNum);
 
         JLabel priority = new JLabel("Priority"); // priority label
         priority.setBounds(450,80,80,25);
