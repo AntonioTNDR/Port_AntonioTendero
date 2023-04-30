@@ -14,10 +14,15 @@ public class Hub {
     }
 
     public String displayHub(){
-        String output = " ";
-        for(int i = 0; i<NUM_ROWS; i++){
+        String output = "";
+        for(int i = NUM_ROWS-1; i>=0; i--){
             for(int j = 0; j<NUM_COLUMNS; j++){
-                output += containers[i][j];
+                if(containers[i][j] == null){
+                    output += "[  ]";
+                }
+                else if(containers[i][j] != null){
+                    output += "[x]";
+                }
             }
             output += "\n";
         }
@@ -27,16 +32,16 @@ public class Hub {
     public void stackContainer(Container container){
         if(container.getPriority() == 1){
             for(int i = 0; i< NUM_COLUMNS; i++){
-                if(containers[PRIORITY1_COLUMN][i] == null){
-                    containers[PRIORITY1_COLUMN][i] = container;
+                if(containers[i][PRIORITY1_COLUMN] == null){
+                    containers[i][PRIORITY1_COLUMN] = container;
                     break;
                 }
             }
         }
         else if(container.getPriority() == 2){
             for(int i = 0; i< NUM_COLUMNS; i++){
-                if(containers[PRIORITY2_COLUMN][i] == null){
-                    containers[PRIORITY2_COLUMN][i] = container;
+                if(containers[i][PRIORITY2_COLUMN] == null){
+                    containers[i][PRIORITY2_COLUMN] = container;
                     break;
                 }
             }
@@ -54,9 +59,10 @@ public class Hub {
     }
 
     public void removeContainer(int column){
-        for(int i = 0; i<NUM_ROWS; i++){
-            if(containers[i][column] != null){
-                containers[i][column] = null;
+        for(int i = NUM_ROWS-1; i>=0; i--){
+            if(containers[i][column-1] != null){
+                containers[i][column-1] = null;
+                return;
             }
         }
     }
@@ -86,7 +92,7 @@ public class Hub {
         int count = 0;
         for(int i = 0; i<NUM_ROWS; i++){
             for(int j = 0; j<NUM_COLUMNS; j++){
-                if(containers[i][j] != null && Objects.requireNonNull(containers[i][i]).getCountryOforigin().equals(countryName)){
+                if(containers[i][j] != null && containers[i][j].getCountryOforigin().equals(countryName)){
                     count++;
                 }
             }
@@ -96,7 +102,7 @@ public class Hub {
 
     public boolean priority1Full(){
         for(int i = 0; i<NUM_ROWS; i++){
-            if(containers[PRIORITY1_COLUMN][i] == null){
+            if(containers[i][PRIORITY1_COLUMN] == null){
                 return false; //if there is a space, it returns false
             }
         }
@@ -105,7 +111,7 @@ public class Hub {
 
     public boolean priority2Full(){
         for(int i = 0; i<NUM_ROWS; i++){
-            if(containers[PRIORITY2_COLUMN][i]==null){
+            if(containers[i][PRIORITY2_COLUMN]==null){
                 return false;//if there is a space, it returns false
             }
         }
@@ -113,7 +119,7 @@ public class Hub {
     }
     public boolean isHubFull(){
         for(int i = 0; i<NUM_ROWS; i++){
-            for(int j = 0; j<PRIORITY3_START_COLUMN; j++){
+            for(int j = PRIORITY3_START_COLUMN; j<NUM_COLUMNS; j++){
                 if(containers[i][j] == null){
                     return false; //if any space is empty, the hub is not full
                 }
